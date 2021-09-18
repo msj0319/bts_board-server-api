@@ -19,8 +19,8 @@ public class SwaggerConfiguration {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(this.getApiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.bts.api.boardserver.controller"))
-                .paths(PathSelectors.ant("/board/**"))
+                .apis(RequestHandlerSelectors.basePackage("com.bts.api.board.controller"))
+                .paths(PathSelectors.any())
                 .build();
 
     }
