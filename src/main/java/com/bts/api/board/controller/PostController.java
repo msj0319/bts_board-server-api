@@ -58,7 +58,6 @@ public class PostController {
     @ApiOperation(value = "게시물 삭제 하기")
     @RequestMapping(value = "/board_post/{p_id}", method = RequestMethod.DELETE)
     public Mono<Void> deleteThePost(@PathVariable(value = "p_id") String id) {
-        return this.postRepository.deleteById(id)
-                .then(this.commentRepository.deleteAll());
+        return this.postRepository.deleteById(id);
     }
 }

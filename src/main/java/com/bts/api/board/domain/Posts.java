@@ -41,17 +41,7 @@ public class Posts implements Serializable {
     @ApiParam(value = "조회수", required = true)
     private int view_cnt;
 
-    private ArrayList<Comment> commentList = new ArrayList<>();
-
-    public ArrayList<Comment> getCommentList() {
-        return commentList;
-    }
-
-    public void setCommentList(ArrayList<Comment> commentList, Comment comment) {
-        comment.setComment_writer(comment.getComment_writer());
-        comment.setComment_content(comment.getComment_content());
-        commentList.add(comment);
-    }
+    private ArrayList<Comment> commentList;
 
     @Builder
     public Posts(@NonNull String author, @NonNull String title, @NonNull String content) {
