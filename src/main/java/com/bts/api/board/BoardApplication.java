@@ -1,13 +1,53 @@
 package com.bts.api.board;
 
+import com.bts.api.board.domain.Posts;
+import com.bts.api.board.repository.CommentRepository;
+import com.bts.api.board.repository.PostsRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
+@Component
+@Slf4j
 @SpringBootApplication
-public class BoardApplication {
+public class BoardApplication implements CommandLineRunner {
+    private final PostsRepository posts;
+    private final CommentRepository comment;
 
-	public static void main(String[] args) {
-		SpringApplication.run(BoardApplication.class, args);
-	}
+    public BoardApplication(PostsRepository posts, CommentRepository comment) {
+        this.posts = posts;
+        this.comment = comment;
+    }
 
+    public static void main(String[] args) {
+        SpringApplication.run(BoardApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        this.comment.deleteAll();
+        this.posts.deleteAll()
+                .thenMany(Flux.just("테스트 게시물 1", "테스트 게시물 2")
+                        .flatMap(
+                                title -> this.posts.save(
+                                        Posts.builder()
+                                                .title(title)
+                                                .author("게시물 등록자")
+                                                .content("Content of " + title)
+                                                .build())
+
+                        )
+                )
+                .thenMany(
+                        this.posts.findAll()
+                )
+                .subscribe(
+                        data -> log.info("found posts: {}", posts),
+                        error -> log.error("", error),
+                        () -> log.info("초기화 완료...")
+                );
+    }
 }

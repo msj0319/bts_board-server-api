@@ -22,7 +22,7 @@ public class CustomPostsRepositoryImpl implements CustomPostsRepository {
         Update update = new Update().set("view_cnt",cnt);
         return mongoTemplate.findAndModify(query,update, Posts.class);
     }
-    //CommentRepo -> 댓글 저장 -> 댓글 내용 가져와서 PostsRepo 에 Update
+    //댓글 작성 -> Comment Repository 댓글 저장 -> 댓글 내용 get, PostsRepository 에 삽입하는 쿼리
     public Mono<Posts> addNewComment(String p_id, Comment comment) {
         Query query = new Query(Criteria.where("p_id").is(p_id));
         Update update = new Update().addToSet("commentList", comment);
