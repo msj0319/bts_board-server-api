@@ -1,5 +1,5 @@
-# Bithumb Tech Academy Final Project: Bithumb NFT Service 구현
-##Board(Community) Server API
+# Final Project: Bithumb NFT Service
+## Board(Community) Server API
 ### docker-compose.yml
 ```yml
 version: '1'
