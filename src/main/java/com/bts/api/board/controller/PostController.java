@@ -43,9 +43,9 @@ public class PostController {
 
     @ApiOperation(value = "게시물 수정하기")
     @RequestMapping(value = "/board_post/{p_id}", method = RequestMethod.PUT)
-    public Mono<Posts> updateThePost(@PathVariable(value = "p_id") String id,
+    public Mono<Posts> updateThePost(@PathVariable(value = "p_id") String p_id,
                                      @RequestBody Posts posts) {
-        return this.postRepository.findById(id)
+        return this.postRepository.findById(p_id)
                 .map(i -> {
                     i.setTitle(posts.getTitle());
                     i.setContent(posts.getContent());
