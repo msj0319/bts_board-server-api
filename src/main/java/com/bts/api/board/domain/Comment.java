@@ -18,8 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Comment implements Serializable {
     @ApiParam(value = "댓글 id", required = true)
-    private @Id
-    String c_id;
+    private @Id String c_id;
     @ApiParam(value = "댓글 작성자", required = true)
     private String comment_writer;
     @ApiParam(value = "댓글 내용", required = true)
@@ -32,7 +31,7 @@ public class Comment implements Serializable {
     private LocalDateTime modifiedPostDate = LocalDateTime.now();
 
     @Builder
-    public Comment(String comment_writer, String comment_content) {
+    public Comment(@NonNull String comment_writer, @NonNull String comment_content) {
         this.comment_writer = comment_writer;
         this.comment_content = comment_content;
     }

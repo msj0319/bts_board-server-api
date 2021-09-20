@@ -9,6 +9,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -24,40 +26,43 @@ public class PostController {
     @ApiOperation(value = "모든 게시물 전체 조회")
     @RequestMapping(value = "/board", method = RequestMethod.GET)
     public Flux<Posts> getAllPosts() {
-        return postRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+        return postRepository.findAll(Sort.by(Sort.Direction.DESC, "p_id"));
     }
 
     @ApiOperation(value = "하나의 게시물 조회")
     @RequestMapping(value = "/board_post/{p_id}", method = RequestMethod.GET)
     public Mono<Posts> getThePosts(@PathVariable(value = "p_id") String id) {
-        int view_cnt = 1;
-        return postRepository.findById(id)
-                .then(customPostsRepository.viewPostAndUpdateViewCount(id, view_cnt));
+        return postRepository.findById(id);
     }
 
     @ApiOperation(value = "게시물 작성")
     @RequestMapping(value = "/board_write", method = RequestMethod.POST)
-    public Mono<Posts> createThePost(@RequestBody Posts posts) {
-        return postRepository.save(posts);
+    public Mono<ResponseEntity<Posts>> createThePost(@RequestBody Posts posts) {
+        return postRepository.save(posts)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @ApiOperation(value = "게시물 수정하기")
     @RequestMapping(value = "/board_post/{p_id}", method = RequestMethod.PUT)
-    public Mono<Posts> updateThePost(@PathVariable(value = "p_id") String p_id,
-                                     @RequestBody Posts posts) {
+    public Mono<ResponseEntity<Posts>> updateThePost(@PathVariable(value = "p_id") String p_id,
+                                                     @RequestBody Posts posts) {
         return this.postRepository.findById(p_id)
-                .map(i -> {
+                .flatMap(i -> {
                     i.setTitle(posts.getTitle());
                     i.setContent(posts.getContent());
                     i.setModifiedPostDate(posts.getModifiedPostDate());
-                    return i;
-                })
-                .flatMap(this.postRepository::save);
+                    return postRepository.save(i);
+                }).map(ResponseEntity::ok)
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @ApiOperation(value = "게시물 삭제 하기")
     @RequestMapping(value = "/board_post/{p_id}", method = RequestMethod.DELETE)
-    public Mono<Void> deleteThePost(@PathVariable(value = "p_id") String id) {
-        return this.postRepository.deleteById(id);
+    public Mono<ResponseEntity<Void>> deleteThePost(@PathVariable(value = "p_id") String id) {
+        return this.postRepository.findById(id)
+                .flatMap(i -> postRepository.delete(i)
+                        .then(Mono.just(new ResponseEntity<Void>(HttpStatus.OK))))
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }
