@@ -1,0 +1,89 @@
+package com.bts.api.board.controller;
+
+import com.bts.api.board.domain.Comment;
+import com.bts.api.board.domain.Posts;
+import com.bts.api.board.repository.CommentRepository;
+import com.bts.api.board.repository.CustomPostsRepositoryImpl;
+import com.bts.api.board.repository.PostsRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@ExtendWith(SpringExtension.class)
+@WebFluxTest(controllers = PostController.class)
+@Import(PostsRepository.class)
+class CommentControllerTest {
+    @MockBean
+    PostsRepository postsRepository;
+    @MockBean
+    CommentRepository commentRepository;
+    @MockBean
+    CustomPostsRepositoryImpl customPostsRepository;
+
+    @Autowired
+    private WebTestClient webTestClient;
+    private Posts posts;
+    private ArrayList<Comment> comments;
+
+    @BeforeEach
+    void setUp() {
+        //댓글 초기화
+        comments = new ArrayList<>();
+        posts = new Posts();
+        posts.setP_id("init_post_id");
+        posts.setAuthor("작성자");
+        posts.setTitle("기존 제목");
+        posts.setContent("기존 내용");
+        posts.setCommentList(comments);
+        posts.setCreatePostDate(LocalDateTime.now());
+        posts.setModifiedPostDate(LocalDateTime.now());
+    }
+
+    @Test
+    @DisplayName("기존 게시물에 댓글 등록 및 확인 테스트")
+    void postTheCommentTest() {
+        //1. 준비: 댓글 포스트할 게시물 찾기
+        Mockito
+                .when(postsRepository.findById("init_post_id"))
+                .thenReturn(Mono.just(posts));
+
+        //실행
+        //2. 댓글 생성
+        Comment comment = new Comment();
+        comment.setC_id("init_comment_id");
+        comment.setComment_writer("댓글 작성자");
+        comment.setComment_content("댓글 내용");
+        comment.setCreatePostDate(LocalDateTime.now());
+
+        //3. 댓글 저장
+        posts.setCommentList(comments, comment);
+        Mockito.when(postsRepository.save(posts))
+                .thenReturn(Mono.just(posts));
+
+        //단언
+        webTestClient.get()
+                .uri("/board_post/{p_id}", "init_post_id")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.p_id").isEqualTo("init_post_id")
+                .jsonPath("$.commentList[0].c_id").isEqualTo("init_comment_id")
+                .jsonPath("$.commentList[0].comment_writer").isEqualTo("댓글 작성자")
+                .jsonPath("$.commentList[0].comment_content").isEqualTo("댓글 내용");
+    }
+}
