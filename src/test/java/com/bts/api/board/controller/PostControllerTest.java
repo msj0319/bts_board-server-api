@@ -41,19 +41,26 @@ class PostControllerTest {
 
     @Autowired
     private WebTestClient webTestClient;
+    private Posts posts;
 
     @BeforeEach
     void setUp() {
+        posts = new Posts();
+        posts.setP_id("init_post_id");
+        posts.setAuthor("작성자");
+        posts.setTitle("기존 제목");
+        posts.setContent("기존 내용");
+        posts.setCreatePostDate(LocalDateTime.now());
+        posts.setModifiedPostDate(LocalDateTime.now());
+        Mockito
+                .when(postsRepository.save(posts))
+                .thenReturn(Mono.just(posts));
     }
 
     @DisplayName("모든 게시물 조회 테스트")
     @Test
     void getAllPostsTest() {
         //준비
-        Posts posts = new Posts();
-        posts.setAuthor("게시물 작성자");
-        posts.setTitle("게시물 제목");
-        posts.setContent("게시물 내용");
         List<Posts> postsList = new ArrayList<>();
         postsList.add(posts);
         Flux<Posts> postsFlux = Flux.fromIterable(postsList);
@@ -75,39 +82,26 @@ class PostControllerTest {
     @DisplayName("단일 게시물 조회 테스트")
     @Test
     void getThePostTest() {
-        //준비
-        Posts posts = new Posts();
-        posts.setP_id("test_id");
-        posts.setAuthor("게시물 작성자");
-        posts.setTitle("게시물 제목");
-        posts.setContent("게시물 내용");
         //실행
         Mockito
-                .when(postsRepository.findById("test_id"))
+                .when(postsRepository.findById("init_post_id"))
                 .thenReturn(Mono.just(posts));
         //단언
-        webTestClient.get().uri("/board_post/{p_id}", "test_id")
+        webTestClient.get().uri("/board_post/{p_id}", "init_post_id")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 //.jsonPath("$.author").isNotEmpty()
-                .jsonPath("$.p_id").isEqualTo("test_id")
-                .jsonPath("$.author").isEqualTo("게시물 작성자")
-                .jsonPath("$.title").isEqualTo("게시물 제목")
-                .jsonPath("$.content").isEqualTo("게시물 내용");
+                .jsonPath("$.p_id").isEqualTo("init_post_id")
+                .jsonPath("$.author").isEqualTo("작성자")
+                .jsonPath("$.title").isEqualTo("기존 제목")
+                .jsonPath("$.content").isEqualTo("기존 내용");
 
     }
 
     @DisplayName("게시물 생성 테스트")
     @Test
     void createThePostTest() {
-        //준비
-        Posts posts = new Posts();
-        posts.setAuthor("게시물 작성자");
-        posts.setTitle("게시물 제목");
-        posts.setContent("게시물 내용");
-        posts.setCreatePostDate(LocalDateTime.now());
-        posts.setModifiedPostDate(LocalDateTime.now());
         //실행
         Mockito
                 .when(postsRepository.save(posts))
@@ -125,7 +119,30 @@ class PostControllerTest {
     @DisplayName("게시물 수정 테스트")
     @Test
     void updateThePostTest() {
-
+        //실행
+        Mockito
+                .when(postsRepository.findById("init_post_id"))
+                .thenReturn(Mono.just(posts));
+        //기존 데이터 값 변경
+        posts.setTitle("변경된 제목");
+        posts.setContent("변경된 내용");
+        posts.setModifiedPostDate(LocalDateTime.now());
+        Mockito
+                .when(postsRepository.save(posts))
+                .thenReturn(Mono.just(posts));
+        //단언
+        webTestClient.put()
+                .uri("/board_post/{p_id}","init_post_id")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(Mono.just(posts), Posts.class)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.p_id").isEqualTo("init_post_id")
+                .jsonPath("$.author").isEqualTo("작성자")
+                .jsonPath("$.title").isEqualTo("변경된 제목")
+                .jsonPath("$.content").isEqualTo("변경된 내용");
     }
 
     @DisplayName("게시물 삭제 테스트")
@@ -135,11 +152,11 @@ class PostControllerTest {
         Mono<Void> voidReturn = Mono.empty();
         //실행
         Mockito
-                .when(postsRepository.deleteById("test_id"))
+                .when(postsRepository.deleteById("init_post_id"))
                 .thenReturn(voidReturn);
         //단언
         webTestClient.get()
-                .uri("/board_post/{p_id}", "test_id")
+                .uri("/board_post/{p_id}", "init_post_id")
                 .exchange()
                 .expectStatus().isOk();
     }
