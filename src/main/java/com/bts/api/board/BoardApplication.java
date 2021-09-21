@@ -13,7 +13,7 @@ import reactor.core.publisher.Flux;
 @Component
 @Slf4j
 @SpringBootApplication
-public class BoardApplication implements CommandLineRunner {
+public class BoardApplication {
     private final PostsRepository posts;
     private final CommentRepository comment;
 
@@ -26,28 +26,28 @@ public class BoardApplication implements CommandLineRunner {
         SpringApplication.run(BoardApplication.class, args);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-        this.comment.deleteAll();
-        this.posts.deleteAll()
-                .thenMany(Flux.just("테스트 게시물 1", "테스트 게시물 2")
-                        .flatMap(
-                                title -> this.posts.save(
-                                        Posts.builder()
-                                                .title(title)
-                                                .author("게시물 등록자")
-                                                .content("Content of " + title)
-                                                .build())
-
-                        )
-                )
-                .thenMany(
-                        this.posts.findAll()
-                )
-                .subscribe(
-                        data -> log.info("found posts: {}", posts),
-                        error -> log.error("", error),
-                        () -> log.info("초기화 완료...")
-                );
-    }
+//    @Override
+//    public void run(String... args) throws Exception {
+//        this.comment.deleteAll();
+//        this.posts.deleteAll()
+//                .thenMany(Flux.just("테스트 게시물 1", "테스트 게시물 2")
+//                        .flatMap(
+//                                title -> this.posts.save(
+//                                        Posts.builder()
+//                                                .title(title)
+//                                                .author("게시물 등록자")
+//                                                .content("Content of " + title)
+//                                                .build())
+//
+//                        )
+//                )
+//                .thenMany(
+//                        this.posts.findAll()
+//                )
+//                .subscribe(
+//                        data -> log.info("found posts: {}", posts),
+//                        error -> log.error("", error),
+//                        () -> log.info("초기화 완료...")
+//                );
+//    }
 }

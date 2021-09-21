@@ -6,6 +6,7 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
@@ -43,7 +44,6 @@ public class Posts implements Serializable {
     public ArrayList<Comment> getCommentList() {
         return commentList;
     }
-
     public void setCommentList(ArrayList<Comment> commentList, Comment comment) {
         this.commentList = commentList;
         commentList.add(comment);

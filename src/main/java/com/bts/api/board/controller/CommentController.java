@@ -5,6 +5,8 @@ import com.bts.api.board.domain.Posts;
 import com.bts.api.board.repository.CommentRepository;
 import com.bts.api.board.repository.CustomPostsRepositoryImpl;
 import com.bts.api.board.repository.PostsRepository;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
 
 @RequiredArgsConstructor
 @RestController
@@ -29,10 +33,10 @@ public class CommentController {
         //2. 매핑된 url로 댓글을 등록할 post 를 찾고, post 도메인의 commentList 에 댓글을 저장한다.
         return this.commentRepository.save(comment)
                 .then(this.postsRepository.findById(p_id).flatMap(i -> {
-                    i.setCommentList(i.getCommentList(), comment);
-                    return this.postsRepository.save(i);
-                })
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND)));
+                            i.setCommentList(i.getCommentList(), comment);
+                            return this.postsRepository.save(i);
+                        })
+                        .map(ResponseEntity::ok)
+                        .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND)));
     }
 }
