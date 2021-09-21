@@ -52,9 +52,7 @@ class PostControllerTest {
         posts.setContent("기존 내용");
         posts.setCreatePostDate(LocalDateTime.now());
         posts.setModifiedPostDate(LocalDateTime.now());
-        Mockito
-                .when(postsRepository.save(posts))
-                .thenReturn(Mono.just(posts));
+
     }
 
     @DisplayName("모든 게시물 조회 테스트")
@@ -69,7 +67,8 @@ class PostControllerTest {
                 .when(postsRepository.findAll())
                 .thenReturn(postsFlux);
         //단언
-        webTestClient.get().uri("/board")
+        webTestClient.get()
+                .uri("/board")
                 .header(HttpHeaders.ACCEPT, "application/json")
                 .exchange()
                 .expectStatus().isOk()
@@ -87,7 +86,8 @@ class PostControllerTest {
                 .when(postsRepository.findById("init_post_id"))
                 .thenReturn(Mono.just(posts));
         //단언
-        webTestClient.get().uri("/board_post/{p_id}", "init_post_id")
+        webTestClient.get()
+                .uri("/board_post/{p_id}", "init_post_id")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -119,6 +119,10 @@ class PostControllerTest {
     @DisplayName("게시물 수정 테스트")
     @Test
     void updateThePostTest() {
+        //준비 - setUp 데이터 save
+        Mockito
+                .when(postsRepository.save(posts))
+                .thenReturn(Mono.just(posts));
         //실행
         Mockito
                 .when(postsRepository.findById("init_post_id"))
@@ -132,7 +136,7 @@ class PostControllerTest {
                 .thenReturn(Mono.just(posts));
         //단언
         webTestClient.put()
-                .uri("/board_post/{p_id}","init_post_id")
+                .uri("/board_post/{p_id}", "init_post_id")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .body(Mono.just(posts), Posts.class)
