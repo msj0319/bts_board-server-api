@@ -31,7 +31,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @WebFluxTest(controllers = PostController.class)
 @Import(PostsRepository.class)
 class PostControllerTest {
-    //BoardApplication 의 더미데이터 테스트 지우고 실행
     @MockBean
     PostsRepository postsRepository;
     @MockBean
@@ -41,10 +40,12 @@ class PostControllerTest {
 
     @Autowired
     private WebTestClient webTestClient;
+
     private Posts posts;
 
     @BeforeEach
     void setUp() {
+        //게시물 데이터 초기화
         posts = new Posts();
         posts.setP_id("init_post_id");
         posts.setAuthor("작성자");

@@ -37,13 +37,23 @@ class CommentControllerTest {
 
     @Autowired
     private WebTestClient webTestClient;
+
     private Posts posts;
+    private Comment comment;
     private ArrayList<Comment> comments;
 
     @BeforeEach
     void setUp() {
-        //댓글 초기화
+        //댓글 초기 데이터
+        comment = new Comment();
+        comment.setC_id("init_comment_id");
+        comment.setComment_writer("댓글 작성자");
+        comment.setComment_content("댓글 내용");
+        comment.setCreatePostDate(LocalDateTime.now());
+
+        //댓글을 등록 할 자료구조 초기화
         comments = new ArrayList<>();
+        //게시물 초기 데이터
         posts = new Posts();
         posts.setP_id("init_post_id");
         posts.setAuthor("작성자");
@@ -55,22 +65,37 @@ class CommentControllerTest {
     }
 
     @Test
-    @DisplayName("기존 게시물에 댓글 등록 및 확인 테스트")
+    @DisplayName("기존 게시물에 댓글 등록 테스트")
     void postTheCommentTest() {
         //1. 준비: 댓글 포스트할 게시물 찾기
         Mockito
                 .when(postsRepository.findById("init_post_id"))
                 .thenReturn(Mono.just(posts));
-
         //실행
-        //2. 댓글 생성
-        Comment comment = new Comment();
-        comment.setC_id("init_comment_id");
-        comment.setComment_writer("댓글 작성자");
-        comment.setComment_content("댓글 내용");
-        comment.setCreatePostDate(LocalDateTime.now());
+        //2. 댓글 저장
+        posts.setCommentList(comments, comment);
+        Mockito.when(postsRepository.save(posts))
+                .thenReturn(Mono.just(posts));
 
-        //3. 댓글 저장
+        //단언
+        webTestClient.put()
+                .uri("/board_post/{p_id}", "init_post_id")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(Mono.just(posts), Posts.class)
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    @DisplayName("기존 게시물에 댓글 조회 테스트")
+    void getTheCommentsInsideAPostTest() {
+        //1. 준비: 댓글 포스트할 게시물 찾기
+        Mockito
+                .when(postsRepository.findById("init_post_id"))
+                .thenReturn(Mono.just(posts));
+        //실행
+        //2. 댓글 저장
         posts.setCommentList(comments, comment);
         Mockito.when(postsRepository.save(posts))
                 .thenReturn(Mono.just(posts));
