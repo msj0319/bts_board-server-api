@@ -30,13 +30,13 @@ public class PostController {
     }
 
     @ApiOperation(value = "하나의 게시물 조회")
-    @RequestMapping(value = "/board_post/{p_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/post/{p_id}", method = RequestMethod.GET)
     public Mono<Posts> getThePosts(@PathVariable(value = "p_id") String id) {
         return postRepository.findById(id);
     }
 
     @ApiOperation(value = "게시물 작성")
-    @RequestMapping(value = "/board_write", method = RequestMethod.POST)
+    @RequestMapping(value = "/write", method = RequestMethod.POST)
     public Mono<ResponseEntity<Posts>> createThePost(@RequestBody Posts posts) {
         return postRepository.save(posts)
                 .map(ResponseEntity::ok)
@@ -44,7 +44,7 @@ public class PostController {
     }
 
     @ApiOperation(value = "게시물 수정하기")
-    @RequestMapping(value = "/board_post/{p_id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/post/{p_id}", method = RequestMethod.PUT)
     public Mono<ResponseEntity<Posts>> updateThePost(@PathVariable(value = "p_id") String p_id,
                                                      @RequestBody Posts posts) {
         return this.postRepository.findById(p_id)
@@ -58,7 +58,7 @@ public class PostController {
     }
 
     @ApiOperation(value = "게시물 삭제 하기")
-    @RequestMapping(value = "/board_post/{p_id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/post/{p_id}", method = RequestMethod.DELETE)
     public Mono<ResponseEntity<Void>> deleteThePost(@PathVariable(value = "p_id") String id) {
         return this.postRepository.findById(id)
                 .flatMap(i -> postRepository.delete(i)

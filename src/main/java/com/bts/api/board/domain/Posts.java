@@ -32,13 +32,16 @@ public class Posts implements Serializable {
 
     @ApiParam(value = "게시물 생성 시간", required = true)
     @CreatedDate
+    @Builder.Default
     private LocalDateTime createPostDate = LocalDateTime.now();
 
     @ApiParam(value = "게시물 수정 시간", required = true)
     @LastModifiedDate
+    @Builder.Default
     private LocalDateTime modifiedPostDate = LocalDateTime.now();
 
     @ApiParam(value = "댓글 리스트", required = true)
+    @Builder.Default
     private ArrayList<Comment> commentList = new ArrayList<>();
 
     public ArrayList<Comment> getCommentList() {

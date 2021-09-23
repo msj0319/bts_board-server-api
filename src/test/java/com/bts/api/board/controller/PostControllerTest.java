@@ -88,7 +88,7 @@ class PostControllerTest {
                 .thenReturn(Mono.just(posts));
         //단언
         webTestClient.get()
-                .uri("/board_post/{p_id}", "init_post_id")
+                .uri("/post/{p_id}", "init_post_id")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -109,7 +109,7 @@ class PostControllerTest {
                 .thenReturn(Mono.just(posts));
         //단언
         webTestClient.post()
-                .uri("/board_write")
+                .uri("/write")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .body(Mono.just(posts), Posts.class)
@@ -137,7 +137,7 @@ class PostControllerTest {
                 .thenReturn(Mono.just(posts));
         //단언
         webTestClient.put()
-                .uri("/board_post/{p_id}", "init_post_id")
+                .uri("/post/{p_id}", "init_post_id")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .body(Mono.just(posts), Posts.class)
@@ -161,7 +161,7 @@ class PostControllerTest {
                 .thenReturn(voidReturn);
         //단언
         webTestClient.get()
-                .uri("/board_post/{p_id}", "init_post_id")
+                .uri("/post/{p_id}", "init_post_id")
                 .exchange()
                 .expectStatus().isOk();
     }

@@ -22,7 +22,7 @@ public class CommentController {
     private final CommentRepository commentRepository;
 
     @ApiOperation(value = "댓글 작성하기")
-    @RequestMapping(value = "/board_post/{p_id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/post/{p_id}", method = RequestMethod.POST)
     public Mono<ResponseEntity<Posts>> postTheComment(@PathVariable(value = "p_id") String p_id,
                                                       @RequestBody Comment comment) {
         //1. 댓글을 먼저 comment db 에 저장
