@@ -1,5 +1,7 @@
 package com.bts.api.board.domain;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.annotations.ApiParam;
 
 import lombok.*;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class Posts implements Serializable {
     @ApiParam(value = "id", required = true)
     private @Id

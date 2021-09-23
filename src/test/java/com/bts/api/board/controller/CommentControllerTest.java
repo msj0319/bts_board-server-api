@@ -47,8 +47,8 @@ class CommentControllerTest {
         //댓글 초기 데이터
         comment = new Comment();
         comment.setC_id("init_comment_id");
-        comment.setComment_writer("댓글 작성자");
-        comment.setComment_content("댓글 내용");
+        comment.setCommentWriter("댓글 작성자");
+        comment.setCommentContent("댓글 내용");
         comment.setCreatePostDate(LocalDateTime.now());
 
         //댓글을 등록 할 자료구조 초기화
@@ -107,8 +107,8 @@ class CommentControllerTest {
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.p_id").isEqualTo("init_post_id")
-                .jsonPath("$.commentList[0].c_id").isEqualTo("init_comment_id")
-                .jsonPath("$.commentList[0].comment_writer").isEqualTo("댓글 작성자")
-                .jsonPath("$.commentList[0].comment_content").isEqualTo("댓글 내용");
+                .jsonPath("$.comment_list[0].c_id").isEqualTo("init_comment_id")
+                .jsonPath("$.comment_list[0].comment_writer").isEqualTo("댓글 작성자")
+                .jsonPath("$.comment_list[0].comment_content").isEqualTo("댓글 내용");
     }
 }
