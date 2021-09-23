@@ -7,20 +7,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
 @Component
 @Slf4j
 @SpringBootApplication
+@EnableDiscoveryClient
 public class BoardApplication {
-    private final PostsRepository posts;
-    private final CommentRepository comment;
-
-    public BoardApplication(PostsRepository posts, CommentRepository comment) {
-        this.posts = posts;
-        this.comment = comment;
-    }
+//    private final PostsRepository posts;
+//    private final CommentRepository comment;
+//
+//    public BoardApplication(PostsRepository posts, CommentRepository comment) {
+//        this.posts = posts;
+//        this.comment = comment;
+//    }
 
     public static void main(String[] args) {
         SpringApplication.run(BoardApplication.class, args);

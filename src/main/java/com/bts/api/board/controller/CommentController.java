@@ -5,8 +5,6 @@ import com.bts.api.board.domain.Posts;
 import com.bts.api.board.repository.CommentRepository;
 import com.bts.api.board.repository.CustomPostsRepositoryImpl;
 import com.bts.api.board.repository.PostsRepository;
-import com.mongodb.client.result.DeleteResult;
-import com.mongodb.client.result.UpdateResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-
-import java.util.ArrayList;
 
 @RequiredArgsConstructor
 @RestController
