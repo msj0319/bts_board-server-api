@@ -1,6 +1,6 @@
 package com.bts.api.board.repository;
 
-import com.bts.api.board.domain.Posts;
+import com.bts.api.board.dto.Posts;
 import reactor.core.publisher.Mono;
 
 public interface CustomPostsRepository {

@@ -1,10 +1,10 @@
 package com.bts.api.board.controller;
 
-import com.bts.api.board.domain.Comment;
-import com.bts.api.board.domain.Posts;
+import com.bts.api.board.dto.Comment;
+import com.bts.api.board.dto.Posts;
 import com.bts.api.board.repository.CommentRepository;
-import com.bts.api.board.repository.CustomPostsRepositoryImpl;
 import com.bts.api.board.repository.PostsRepository;
+import com.bts.api.board.service.PostsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,19 +22,16 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(controllers = PostController.class)
+@WebFluxTest(controllers = PostsController.class)
 @Import(PostsRepository.class)
 class CommentControllerTest {
     @MockBean
     PostsRepository postsRepository;
     @MockBean
-    CommentRepository commentRepository;
+    PostsService postsService;
     @MockBean
-    CustomPostsRepositoryImpl customPostsRepository;
-
+    CommentRepository commentRepository;
     @Autowired
     private WebTestClient webTestClient;
 
@@ -69,12 +66,12 @@ class CommentControllerTest {
     void postTheCommentTest() {
         //1. 준비: 댓글 포스트할 게시물 찾기
         Mockito
-                .when(postsRepository.findById("init_post_id"))
+                .when(postsService.findById("init_post_id"))
                 .thenReturn(Mono.just(posts));
         //실행
         //2. 댓글 저장
         posts.setCommentList(comments, comment);
-        Mockito.when(postsRepository.save(posts))
+        Mockito.when(postsService.save(posts))
                 .thenReturn(Mono.just(posts));
 
         //단언
@@ -92,12 +89,12 @@ class CommentControllerTest {
     void getTheCommentsInsideAPostTest() {
         //1. 준비: 댓글 포스트할 게시물 찾기
         Mockito
-                .when(postsRepository.findById("init_post_id"))
+                .when(postsService.findById("init_post_id"))
                 .thenReturn(Mono.just(posts));
         //실행
         //2. 댓글 저장
         posts.setCommentList(comments, comment);
-        Mockito.when(postsRepository.save(posts))
+        Mockito.when(postsService.save(posts))
                 .thenReturn(Mono.just(posts));
 
         //단언
@@ -113,7 +110,7 @@ class CommentControllerTest {
     }
 
     @Test
-    @DisplayName("댓글 삭제 테스트")
+    @DisplayName("기존 게시물에 댓글 삽입 및 삭제 테스트")
     void deleteTheCommentTest() {
         /* 준비 */
         //새 댓글 작성
@@ -131,26 +128,26 @@ class CommentControllerTest {
 
         //저장할 포스트 찾기
         Mockito
-                .when(postsRepository.findById("init_post_id"))
+                .when(postsService.findById("init_post_id"))
                 .thenReturn(Mono.just(posts));
 
         //새 댓글 저장
         //댓글 2
         posts.setCommentList(comments, comment2);
         Mockito
-                .when(postsRepository.save(posts))
+                .when(postsService.save(posts))
                 .thenReturn(Mono.just(posts));
         //댓글 3
         posts.setCommentList(comments, comment3);
         Mockito
-                .when(postsRepository.save(posts))
+                .when(postsService.save(posts))
                 .thenReturn(Mono.just(posts));
 
         /* 실행 */
         //댓글 2 삭제
         posts.deleteCommentList(comments, comments.indexOf(comment2));
         Mockito
-                .when(postsRepository.save(posts))
+                .when(postsService.save(posts))
                 .thenReturn(Mono.just(posts));
 
         /* 단언 */

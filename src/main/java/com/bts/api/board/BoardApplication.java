@@ -1,15 +1,10 @@
 package com.bts.api.board;
 
-import com.bts.api.board.domain.Posts;
-import com.bts.api.board.repository.CommentRepository;
-import com.bts.api.board.repository.PostsRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
 
 @Component
 @Slf4j

@@ -1,4 +1,4 @@
-package com.bts.api.board.domain;
+package com.bts.api.board.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -21,7 +21,8 @@ import java.time.LocalDateTime;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class Comment implements Serializable {
     @ApiParam(value = "댓글 id", required = true)
-    private @Id String c_id;
+    private @Id
+    String c_id;
     @ApiParam(value = "댓글 작성자", required = true)
     private String commentWriter;
     @ApiParam(value = "댓글 내용", required = true)

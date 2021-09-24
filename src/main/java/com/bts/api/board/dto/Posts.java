@@ -1,19 +1,15 @@
-package com.bts.api.board.domain;
+package com.bts.api.board.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.annotations.ApiParam;
 
-import io.swagger.models.auth.In;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -58,6 +54,7 @@ public class Posts implements Serializable {
         this.title = title;
         this.content = content;
     }
+
     public ArrayList<Comment> getCommentList() {
         return commentList;
     }
@@ -66,6 +63,7 @@ public class Posts implements Serializable {
         this.commentList = commentList;
         this.commentList.add(comment);
     }
+
     //바로 들어온 댓글은 바로 삭제를 할 수 없다. 다른 댓글을 추가 시켜야 삭제하려했던 댓글을 삭제할 수 있다.
     public void deleteCommentList(ArrayList<Comment> commentList, int index) {
         this.commentList = commentList;

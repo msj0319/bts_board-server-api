@@ -1,10 +1,9 @@
 package com.bts.api.board.controller;
 
-import com.bts.api.board.domain.Comment;
-import com.bts.api.board.domain.Posts;
-import com.bts.api.board.repository.CommentRepository;
-import com.bts.api.board.repository.CustomPostsRepositoryImpl;
-import com.bts.api.board.repository.PostsRepository;
+import com.bts.api.board.dto.Comment;
+import com.bts.api.board.dto.Posts;
+import com.bts.api.board.service.CommentService;
+import com.bts.api.board.service.PostsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +18,8 @@ import reactor.core.publisher.Mono;
 @RestController
 @Api(value = "CommentController")
 public class CommentController {
-    private final PostsRepository postsRepository;
-    private final CustomPostsRepositoryImpl customPostsRepository;
-    private final CommentRepository commentRepository;
+    private final PostsService postsService;
+    private final CommentService commentService;
 
     @ApiOperation(value = "댓글 작성하기")
     @RequestMapping(value = "/post/{p_id}", method = RequestMethod.POST)
@@ -29,11 +27,11 @@ public class CommentController {
                                                       @RequestBody Comment comment) {
         //1. 댓글을 먼저 comment db 에 저장
         //2. 매핑된 url로 댓글을 등록할 post 를 찾고, post 도메인의 commentList 에 댓글을 저장한다.
-        return this.commentRepository.save(comment)
-                .then(this.postsRepository.findById(p_id)
+        return this.commentService.save(comment)
+                .then(this.postsService.findById(p_id)
                         .flatMap(i -> {
                             i.setCommentList(i.getCommentList(), comment);
-                            return this.postsRepository.save(i);
+                            return this.postsService.save(i);
                         })
                         .map(ResponseEntity::ok)
                         .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND)));
@@ -41,11 +39,13 @@ public class CommentController {
 
     @ApiOperation(value = "댓글 삭제하기")
     @RequestMapping(value = "/post/{p_id}/delete_comment", method = RequestMethod.PUT)
-    public Mono<Posts> deleteTheComment(@PathVariable(value = "p_id") String p_id,
+    public Mono<ResponseEntity<Posts>> deleteTheComment(@PathVariable(value = "p_id") String p_id,
                                         @RequestBody Comment comment) {
-        return this.postsRepository.findById(p_id).flatMap(i -> {
-            i.deleteCommentList(i.getCommentList(), i.getCommentList().indexOf(comment));
-            return this.postsRepository.save(i);
-        });
+        return this.postsService.findById(p_id)
+                .flatMap(i -> {
+                    i.deleteCommentList(i.getCommentList(), i.getCommentList().indexOf(comment));
+                    return this.postsService.save(i);
+                }).map(ResponseEntity::ok)
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }

@@ -1,9 +1,10 @@
 package com.bts.api.board.controller;
 
-import com.bts.api.board.domain.Posts;
+import com.bts.api.board.dto.Posts;
 import com.bts.api.board.repository.CommentRepository;
-import com.bts.api.board.repository.CustomPostsRepositoryImpl;
 import com.bts.api.board.repository.PostsRepository;
+import com.bts.api.board.service.CommentService;
+import com.bts.api.board.service.PostsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -25,19 +25,16 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(controllers = PostController.class)
+@WebFluxTest(controllers = PostsController.class)
 @Import(PostsRepository.class)
-class PostControllerTest {
+class PostsControllerTest {
     @MockBean
     PostsRepository postsRepository;
     @MockBean
-    CommentRepository commentRepository;
+    PostsService postsService;
     @MockBean
-    CustomPostsRepositoryImpl customPostsRepository;
-
+    CommentRepository commentRepository;
     @Autowired
     private WebTestClient webTestClient;
 
@@ -65,7 +62,7 @@ class PostControllerTest {
         Flux<Posts> postsFlux = Flux.fromIterable(postsList);
         //실행
         Mockito
-                .when(postsRepository.findAll())
+                .when(postsService.findAll())
                 .thenReturn(postsFlux);
         //단언
         webTestClient.get()
@@ -75,8 +72,8 @@ class PostControllerTest {
                 .expectStatus().isOk()
                 .expectBodyList(Posts.class);
         Mockito
-                .verify(postsRepository, Mockito.times(1))
-                .findAll(Sort.by(Sort.Direction.DESC, "p_id"));
+                .verify(postsService, Mockito.times(1))
+                .findAll();
     }
 
     @DisplayName("단일 게시물 조회 테스트")
@@ -84,7 +81,7 @@ class PostControllerTest {
     void getThePostTest() {
         //실행
         Mockito
-                .when(postsRepository.findById("init_post_id"))
+                .when(postsService.findById("init_post_id"))
                 .thenReturn(Mono.just(posts));
         //단언
         webTestClient.get()
@@ -105,7 +102,7 @@ class PostControllerTest {
     void createThePostTest() {
         //실행
         Mockito
-                .when(postsRepository.save(posts))
+                .when(postsService.save(posts))
                 .thenReturn(Mono.just(posts));
         //단언
         webTestClient.post()
@@ -122,18 +119,18 @@ class PostControllerTest {
     void updateThePostTest() {
         //준비 - setUp 데이터 save
         Mockito
-                .when(postsRepository.save(posts))
+                .when(postsService.save(posts))
                 .thenReturn(Mono.just(posts));
         //실행
         Mockito
-                .when(postsRepository.findById("init_post_id"))
+                .when(postsService.findById("init_post_id"))
                 .thenReturn(Mono.just(posts));
         //기존 데이터 값 변경
         posts.setTitle("변경된 제목");
         posts.setContent("변경된 내용");
         posts.setModifiedPostDate(LocalDateTime.now());
         Mockito
-                .when(postsRepository.save(posts))
+                .when(postsService.save(posts))
                 .thenReturn(Mono.just(posts));
         //단언
         webTestClient.put()
@@ -157,7 +154,7 @@ class PostControllerTest {
         Mono<Void> voidReturn = Mono.empty();
         //실행
         Mockito
-                .when(postsRepository.deleteById("init_post_id"))
+                .when(postsService.deleteById("init_post_id"))
                 .thenReturn(voidReturn);
         //단언
         webTestClient.get()
