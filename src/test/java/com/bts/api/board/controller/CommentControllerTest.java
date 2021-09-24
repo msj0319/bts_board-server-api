@@ -111,4 +111,60 @@ class CommentControllerTest {
                 .jsonPath("$.comment_list[0].comment_writer").isEqualTo("댓글 작성자")
                 .jsonPath("$.comment_list[0].comment_content").isEqualTo("댓글 내용");
     }
+
+    @Test
+    @DisplayName("댓글 삭제 테스트")
+    void deleteTheCommentTest() {
+        /* 준비 */
+        //새 댓글 작성
+        Comment comment2 = new Comment();
+        comment2.setC_id("init_comment_id2");
+        comment2.setCommentWriter("댓글 작성자2");
+        comment2.setCommentContent("댓글 내용");
+        comment2.setCreatePostDate(LocalDateTime.now());
+
+        Comment comment3 = new Comment();
+        comment3.setC_id("init_comment_id3");
+        comment3.setCommentWriter("댓글 작성자3");
+        comment3.setCommentContent("댓글 내용");
+        comment3.setCreatePostDate(LocalDateTime.now());
+
+        //저장할 포스트 찾기
+        Mockito
+                .when(postsRepository.findById("init_post_id"))
+                .thenReturn(Mono.just(posts));
+
+        //새 댓글 저장
+        //댓글 2
+        posts.setCommentList(comments, comment2);
+        Mockito
+                .when(postsRepository.save(posts))
+                .thenReturn(Mono.just(posts));
+        //댓글 3
+        posts.setCommentList(comments, comment3);
+        Mockito
+                .when(postsRepository.save(posts))
+                .thenReturn(Mono.just(posts));
+
+        /* 실행 */
+        //댓글 2 삭제
+        posts.deleteCommentList(comments, comments.indexOf(comment2));
+        Mockito
+                .when(postsRepository.save(posts))
+                .thenReturn(Mono.just(posts));
+
+        /* 단언 */
+        webTestClient.put()
+                .uri("/post/{p_id}/", "init_post_id")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(Mono.just(posts), Posts.class)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.p_id").isEqualTo("init_post_id")
+                .jsonPath("$.comment_list[0].c_id").isEqualTo("init_comment_id3")
+                .jsonPath("$.comment_list[0].comment_writer").isEqualTo("댓글 작성자3")
+                .jsonPath("$.comment_list[0].comment_content").isEqualTo("댓글 내용");
+    }
 }
